@@ -253,15 +253,15 @@ class DFF(BaseVideoDetector):
                 x, proposal_list, img_metas, rescale=rescale)
         # Single stage detector
         elif hasattr(self.detector, 'bbox_head'):
-            outs = self.bbox_head(x)
-            bbox_list = self.bbox_head.get_bboxes(
+            outs = self.detector.bbox_head(x)
+            bbox_list = self.detector.bbox_head.get_bboxes(
                 *outs, img_metas, rescale=rescale)
             # skip post-processing when exporting to ONNX
             if torch.onnx.is_in_onnx_export():
                 return bbox_list
 
             outs = [
-                bbox2result(det_bboxes, det_labels, self.bbox_head.num_classes)
+                bbox2result(det_bboxes, det_labels, self.detector.bbox_head.num_classes)
                 for det_bboxes, det_labels in bbox_list
             ]
         else:
